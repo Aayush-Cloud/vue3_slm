@@ -44,6 +44,7 @@ export default {
 </script>
 <style scoped>
 
+
 .toggle-button {
   position: absolute;
   top: 0;
@@ -63,14 +64,15 @@ export default {
 }
 
 .dashboard-nav {
-  position: relative;
+  left:0;
+  position: fixed;
   width: 5vw; 
   transition: width 0.5s ease;
   border-radius: 5px;
   background-color: #0B153A;
-  padding: 1rem;
+  padding: 2.5vw;
   flex-direction: column;
-  height: 95vh;
+  height: 88vh;
 }
 
 .toggle-button {

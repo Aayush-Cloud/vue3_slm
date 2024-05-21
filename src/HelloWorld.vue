@@ -135,3 +135,10 @@ padding: 20px;
   padding: 1rem;
 }
 </style>
+.info-form{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  width: 80%;
+}

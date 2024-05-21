@@ -19,7 +19,7 @@ import {
   faTrash, 
   faPenSquare,
   faArrowRightFromBracket,
-  faTimes
+  faTimes,faFilter
 } from '@fortawesome/free-solid-svg-icons'
 
 library.add(
@@ -38,7 +38,7 @@ library.add(
   faTrash, 
   faPenSquare,
   faArrowRightFromBracket,
-  faTimes
+  faTimes,faFilter
 )
 
 const app = createApp(App)

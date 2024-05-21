@@ -2,39 +2,48 @@
   <div class="side-container">
     <div class="search-container">
       <div class="title">Open DCOS</div> 
-      <SearchBar />
+      <SearchBar @updateSearch="updateSearch"/>
+
+    </div>
+    <div class="filter-icon" @click="showFilterOverlay = true">
+        <div class="filter-title">Filter</div>
+      <font-awesome-icon :icon="['fas', 'filter']"  />
+    </div>
+    
+    <div v-if="showFilterOverlay" class="filter-overlay">
+     
+      <font-awesome-icon :icon="['fas', 'times']" class="close-icon" @click="showFilterOverlay = false" />
+      
+      <div class="filter-container">
+        <div class="filter-overlay-title">Filter by Health Status</div>
+        <div class="filter-option">
+          <input type="checkbox" id="healthy" value="healthy" v-model="healthStatusFilter" />
+          <label for="healthy" class="filter-labels">Healthy</label>
+        </div>
+        <div class="filter-option">
+          <input type="checkbox" id="unhealthy" value="unhealthy" v-model="healthStatusFilter" />
+          <label for="unhealthy" class="filter-labels">Unhealthy</label>
+        </div>
+       
+      </div>
     </div>
     <div class="resource-section">
       <div class="resource-tab-heading">Automation Systems</div> 
-      <div class="resource-tab-button" v-for="(resource, index) in resources" :key="index">
+      <div class="resource-tab-button" v-for="(resource, index) in filteredResources" :key="index">
         <div class="resource-title">{{ resource.name }}</div>
         <div class="resource-icons">
           <font-awesome-icon :icon="['fas', 'info']" class="resource-icons"  v-on:mouseover="showResourceDetails(resource)" v-on:mouseout="showOverlayinfo = false" />
-          <font-awesome-icon :icon="['fas', 'pen-square']" class="resource-icons" />
+          <font-awesome-icon :icon="['fas', 'pen-square']" class="resource-icons" @click="editResource(resource)" />
+
           <font-awesome-icon :icon="['fas', 'trash']" class="resource-icons" @click="deleteResource(index)" />
         </div>
       </div>
     </div>
     <div class="resource-section">
-      <!-- Add Button -->
-      <div class="add-button" @click="showOverlay = true">
-        <font-awesome-icon :icon="['fas', 'circle-plus']" />
-      </div>
-      <!-- Overlay Screen -->
-      <div v-if="showOverlay" class="overlay-screen">
-        <font-awesome-icon :icon="['fas', 'times']" class="close-icon" @click="showOverlay = false" />
-        <div @click="handleAddExistingResource" class="overlay-button"><font-awesome-icon :icon="['fas', 'circle-plus']" class="overlay-icon"/> <div  >Add Existing Resource</div></div> 
-        <div @click="handleCreateNewResource" class="overlay-button"><font-awesome-icon :icon="['fas', 'pen-square']"  class="overlay-icon" /><div >Create New Resource</div></div> 
-      </div>
-      <!-- Overlay Screen -->
-      <div v-if="showOverlay2" class="overlay-screen">
-        <font-awesome-icon :icon="['fas', 'times']" class="close-icon" @click="showOverlay2 = false" />
-        <div  @click="handleHost"  class="overlay-button"><font-awesome-icon :icon="['fas', 'circle-plus']" class="overlay-icon"/> <div>Host</div></div> 
-        <div  @click="handleCluster" class="overlay-button"><font-awesome-icon :icon="['fas', 'pen-square']"  class="overlay-icon" /><div>Cluster</div></div> 
-      </div>
+   
       <!-- Overlay Screen Info-->
       <div v-if="showOverlayinfo && shownResource" class="overlay-screen-info">
-        <!-- your overlay content -->
+       
         <div class="info">
           <h2>Description</h2>
           <p>{{ shownResource.description }}</p>
@@ -48,57 +57,127 @@
           <p>{{ shownResource.type }}</p>
         </div>
         <div class="info">
+          <h2>Automation Project</h2>
+          <p>{{ shownResource.automationProject }}</p>
+        </div>
+        <div class="info">
           <h2>Identification</h2>
-          <p>{{ shownResource.identification }}</p>
+          <p>{{shownResource.identification}}</p>
+          
         </div>
         <div class="info">
-          <h2>Operating System</h2>
-          <p>-</p>
+          <h2>Id</h2>
+          <p>{{shownResource.id}}</p>
         </div>
-        <div class="info">
-          <h2>UUID</h2>
-          <p>UUID</p>
-        </div>
-        <div class="info">
-          <h2>Cluster Member</h2>
-          <p>False</p>
-        </div>
+      
       </div>
+        <!-- Edit Overlay Screen -->
+  <div v-if="showOverlayEdit && shownResource" class="overlay-screen-info">
+    <font-awesome-icon :icon="['fas', 'times']" class="close-icon" @click="showOverlayEdit = false" />
+    <form class="info-form" @submit.prevent="handleEditResource">
+      <div class="info">
+        <h2>Description</h2>
+        <input v-model="shownResource.description" type="text" />
+      </div>
+      <div class="info">
+        <h2>HealthStatus</h2>
+        <input class="input" v-model="shownResource.healthStatus" type="text" />
+      </div>
+      <div class="info">
+        <h2>Type</h2>
+        <input v-model="shownResource.type" type="text" />
+      </div>
+      <div class="info">
+        <h2>Automation Project</h2>
+        <input v-model="shownResource.automationProject" type="text" />
+      </div>
+      <div class="info">
+        <h2>Identification</h2>
+        <input v-model="shownResource.identification" type="text" />
+      </div>
+  
+   
+      <button type="submit">Save</button>
+    </form>
+  </div>
     </div>
   </div>
 </template>
   
-  <script>
-  import SearchBar from './SearchBar.vue';
-  import axios from 'axios';
+<script>
+import SearchBar from './SearchBar.vue';
+import { fetchResources, handleEditResource, deleteResource } from './api.js';
+import './AutomationStyles.css'
+
+export default {
+  name: 'SideContainer',
+  components: {
+    SearchBar
+  },
+  data() {
+    return {
+      showOverlayEdit: false,
+      showOverlay: false,
+      shownResource: null,
+      showOverlay2 : false,
+      showOverlayinfo: false,
+      resources: [],
+      filteredResources: [],
+      healthStatusFilter: [],
+      searchTerm: '',
+      showFilterOverlay: false
+    };
+  },
+  created() {
+    this.fetchResources();
+  }, 
+ async created() {
+  await this.fetchResources();
+  this.filteredResources = this.resources;
+},
+  watch: {
+    healthStatusFilter() {
+      this.filterResources();
+    },
+  },
   
-  export default {
-    name: 'SideContainer',
-    components: {
-      SearchBar
+  computed: {
+  filteredResources() {
+    let resources = this.resources;
+
+   
+    if (this.searchTerm) {
+      resources = resources.filter(resource =>
+        resource[this.selectedField].toLowerCase().includes(this.searchTerm.toLowerCase())
+      );
+    }
+
+
+    if (this.healthStatusFilter.length > 0) {
+      resources = resources.filter(resource =>
+        this.healthStatusFilter.includes(resource.healthStatus)
+      );
+    }
+
+    return resources;
+  },
+  },
+  methods: { 
+    async handleEditResource() {
+      try {
+        const response = await handleEditResource(this.shownResource.id, this.shownResource);
+     
+      } catch (error) {
+        console.error(error);
+      }
     },
-    data() {
-      return {
-        showOverlay: false,
-        shownResource: null, // Add this line
-        showOverlay2 : false,
-        showOverlayinfo: false,
-        resources: [],
-        clusters: ['Cluster 1', 'Cluster 2']
-      };
+    async fetchResources() {
+      try {
+        this.resources = await fetchResources();
+      } catch (error) {
+        console.error(error);
+      }
     },
-    created() {
-      this.fetchResources();
-    },
-    methods: {
-      async fetchResources() {
-        try {
-          const response = await axios.get('http://10.17.164.24:3000/api/automation-system/list');
-          this.resources = response.data;
-        } catch (error) {
-          console.error(error);
-        }
-      },
       handleAddExistingResource() {
         this.showOverlay = false;
       },
@@ -115,174 +194,40 @@
         this.showOverlay = false;
         this.showOverlay2 = false;
       },
-      deleteResource(index) {
-        this.resources.splice(index, 1);
-      },
       deleteCluster(index) {
         this.clusters.splice(index, 1);
       },
-      showResourceDetails(resource) { // Add this method
+      showResourceDetails(resource) { // Added this method because of the issue in rendering the info content.
         this.shownResource = resource;
         this.showOverlayinfo = true;
+      },
+      editResource(resource) {
+  this.shownResource = resource;
+  this.showOverlayEdit = true;
+},
+    
+    async deleteResource(index) {
+      const resource = this.resources[index];
+      try {
+        await deleteResource(resource.id);
+        this.resources.splice(index, 1);
+      } catch (error) {
+        console.error(error);
       }
-    }
-  };
-  </script>
-  
-  
-  <style scoped>
-  .overlay-screen-info {
-  position: fixed;
-  
-  top: 25%;
-  left: 25%;
-  width: 50%;
-  height: 50%;
-  background-color: #293565;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  color: white;
-  z-index: 100;
-  border-radius: 10px;
+    },
+    filterResources() {
+      this.filteredResources = this.resources.filter(resource => {
+        return this.healthStatusFilter.length === 0 || this.healthStatusFilter.includes(resource.healthStatus);
+      });
+    },
+    updateSearch(search) {
+    this.searchTerm = search.term;
+    this.selectedField = search.field;
+  },
+
   }
-  .info {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 40%;
-  margin: 1vw 0;
-  }
-  
-  .info h2 {
-  margin: 0;
-  font-size: 1vw;
-  }
-  
-  .info p {
-  margin: 0;
-  font-size: 1vw;
-  }
-  .title {
-  text-align: left;
-  font-size: 1.5vw;
-  margin-bottom: 2vw;
-  margin-left: 1vw;
-  
-  }
-  .side-container {
-  width: 70%;
-  margin-left: 10%;
-  margin-right: 15%; 
-  }
-  
-  .search-container {
-  margin: 1%;
-  width: 100%;
-  border-radius: 5%; 
-  padding: 5px;
-  }
-  
-  .resource-section{
-  padding: 30px;
-  }
-  
-  .resource-tab-heading{
-  flex: none;
-  text-align: left;
-  margin-bottom: 10px;
-  margin-left: 0.5%;
-  font-size: 1.5vw;
-  margin-bottom: 1vw;
-  }
-  
-  .resource-tab-button {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  padding: 1rem;
-  border-radius: 15px;
-  background-color: #0B153A;
-  cursor: pointer;
-  justify-content: space-between;
-  transition: background-color 0.2s ease-in-out;
-  font-size: 1.2vw;
-  margin-bottom: 1vw;
-  }
-  
-  .resource-tab-button:hover {
-  background-color: #e0e0e0;
-  }
-  
-  .resource-title {
-  flex: none; 
-  font-weight: bold;
-  margin-right: 1rem;
-  font-size: 1.5vw;
-  }
-  
-  .resource-icons {
-  display: flex;
-  color: white;
-  justify-content: flex-end;
-  height: 1rem;
-  margin-left: 1vw;
-  fill: white;
-  cursor: pointer;
-  width: 1.5vw;
-  height: 1.5vw;
-  }
+};
+</script>
   
   
-  
-  .resource-icons:hover {
-  fill: #007bff;
-  }
-  .add-button {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  cursor: pointer;
-  font-size: 5vw;
-  }
-  
-  
-  
-  .overlay-screen {
-  
-  position: fixed;
-  top: 25%;
-  left: 25%;
-  width: 50vw;
-  height: 20vw;
-  background: #0B153A;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  border-radius: 10px;
-  transition: all 0.3s ease-in-out;
-  animation: slide-in 0.5s forwards;
-  }
-  
-  .overlay-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 20vw;
-    height: 4vw;
-    background-color: #293565;
-    border-radius: 10px;
-    cursor: pointer;
-  }
-  .overlay-icon {
-    margin-right: 1vw;
-  }
-  .close-icon {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  cursor: pointer;
-  color: #fff;
-  }
-  
-  </style>
+ 

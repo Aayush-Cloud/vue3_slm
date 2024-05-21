@@ -45,7 +45,7 @@
     </div>
      <!-- Overlay Screen Info-->
   <div v-if="showOverlayinfo" class="overlay-screen-info">
-    <!-- your overlay content -->
+   
     <div class="info">
     <h2>Hostname</h2>
     <p>Host 1</p>

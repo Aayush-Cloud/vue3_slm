@@ -1,0 +1,192 @@
+
+.overlay-screen-info {
+position: fixed;
+
+top: 25%;
+left: 25%;
+width: 50%;
+height: 50%;
+background-color: #293565;
+display: flex;
+flex-direction: column;
+align-items: center;
+color: white;
+z-index: 100;
+border-radius: 10px;
+}
+.info {
+display: flex;
+align-items: center;
+justify-content: space-between;
+width: 80%;
+margin: 1vw 0;
+}
+
+.info h2 {
+margin: 0;
+font-size: 1vw;
+}
+
+.info p {
+margin: 0;
+font-size: 1vw;
+}
+.info-form{
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: space-between;
+width: 80%;
+}
+.title {
+text-align: left;
+font-size: 1.5vw;
+margin-bottom: 2vw;
+margin-left: 1vw;
+
+}
+.side-container {
+width: 70%;
+margin-left: 10%;
+margin-right: 15%; 
+}
+
+.search-container {
+margin: 1%;
+width: 100%;
+border-radius: 5%; 
+padding: 5px;
+}
+
+.resource-section{
+padding: 30px;
+}
+
+.resource-tab-heading{
+flex: none;
+text-align: left;
+margin-bottom: 10px;
+margin-left: 0.5%;
+font-size: 1.5vw;
+margin-bottom: 1vw;
+}
+
+.resource-tab-button {
+width: 100%;
+display: flex;
+align-items: center;
+padding: 1rem;
+border-radius: 15px;
+background-color: #0B153A;
+cursor: pointer;
+justify-content: space-between;
+transition: background-color 0.2s ease-in-out;
+font-size: 1.2vw;
+margin-bottom: 1vw;
+}
+
+.resource-tab-button:hover {
+background-color: #e0e0e0;
+}
+
+.resource-title {
+flex: none; 
+font-weight: bold;
+margin-right: 1rem;
+font-size: 1.5vw;
+}
+
+.resource-icons {
+display: flex;
+color: white;
+justify-content: flex-end;
+height: 1rem;
+margin-left: 1vw;
+fill: white;
+cursor: pointer;
+width: 1.5vw;
+height: 1.5vw;
+}
+
+
+
+.resource-icons:hover {
+fill: #007bff;
+}
+.add-button {
+position: fixed;
+bottom: 20px;
+right: 20px;
+cursor: pointer;
+font-size: 5vw;
+}
+
+.overlay-screen {
+
+position: fixed;
+top: 25%;
+left: 25%;
+width: 60vw;
+height: 20vw;
+background: #0B153A;
+display: flex;
+justify-content: space-around;
+align-items: center;
+border-radius: 10px;
+transition: all 0.3s ease-in-out;
+animation: slide-in 0.5s forwards;
+}
+
+.overlay-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20vw;
+  height: 4vw;
+  background-color: #293565;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.overlay-icon {
+  margin-right: 1vw;
+}
+.close-icon {
+position: absolute;
+top: 10px;
+right: 10px;
+cursor: pointer;
+color: #fff;
+}
+.filter-icon {
+font-size: 1.5vw;
+cursor: pointer;
+display: flex;
+justify-content: end;
+}
+.filter-title {
+    margin-right: 1vw;
+}
+.filter-overlay {
+position: fixed;
+top: 35%;
+left: 35%;
+width: 35vw;
+height: 20vw;
+background: #0B153A;
+display: flex;
+justify-content: space-around;
+align-items: center;
+border-radius: 10px;
+}
+
+.filter-labels{
+    font-size: 1.5vw;
+}
+.filter-option{
+    display: flex;
+    align-items: center;
+}
+.filter-overlay-title {
+    font-size: 1.5vw;
+    margin-bottom: 1vw;
+}
